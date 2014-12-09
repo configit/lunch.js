@@ -1,3 +1,7 @@
+# Lunch.js
+
+This repository is for keeping resources and discussions around the LunchJS sessions at Configit A/S.  
+
 ### Ideas for sessions
 
 * [ES6 (JavaScript next is now)](https://github.com/configit/lunch.js/issues/1)
