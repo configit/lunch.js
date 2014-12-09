@@ -19,5 +19,5 @@ This repository is for keeping resources and discussions around the LunchJS sess
 * [ClojureScript](https://github.com/configit/lunch.js/issues/13)
 * [Om](https://github.com/configit/lunch.js/issues/14)
 * [Css animations](https://github.com/configit/lunch.js/issues/15)
-* [SVG]((https://github.com/configit/lunch.js/issues/16)
+* [SVG](https://github.com/configit/lunch.js/issues/16)
 
