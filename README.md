@@ -2,7 +2,7 @@
 
 * [ES6 (JavaScript next is now)](https://github.com/configit/lunch.js/issues/1)
 * [React](https://github.com/configit/lunch.js/issues/2)
-* [React and Flux]((ttps://github.com/configit/lunch.js/issues/3)
+* [React and Flux](https://github.com/configit/lunch.js/issues/3)
 * [Testing javascript](https://github.com/configit/lunch.js/issues/4)
 * [Promises](https://github.com/configit/lunch.js/issues/5) 
 * [Javascript modules](https://github.com/configit/lunch.js/issues/6) 
