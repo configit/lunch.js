@@ -14,4 +14,7 @@
 * Service Worker - http://jakearchibald.com/2014/using-serviceworker-today/
 * ClojureScript - https://github.com/clojure/clojurescript
 * Om - https://github.com/swannodette/om
+* Css transitions
+* SVG
+* Canvas
 
