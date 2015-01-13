@@ -3,20 +3,19 @@
 var webpack = require('webpack');
 
 module.exports = {
+  cache: true,
   context: __dirname,
-  devtool: 'source-map',
-  entry: [
-    'webpack-dev-server/client?http://localhost:8080',
-    'webpack/hot/only-dev-server',
-    './app.js'
-  ],
+  devtool: 'eval-source-map',
+  entry: {
+    'quote-list' : ['./quote-list/app.js'],
+    're-render' : ['./re-render/app.js']
+  },
   output: {
     path: __dirname,
-    filename: "bundle.js"
+    filename: "[name].bundle.js",
+    publicPath: '/scripts/'
   },
-  plugins: [
-    new webpack.HotModuleReplacementPlugin()
-  ],
+  plugins: [ ],
   resolve: {
     // Allow to omit extensions when requiring these files
     extensions: ['', '.js', '.jsx']
@@ -31,6 +30,7 @@ module.exports = {
       { test: /\.eot$/, loader: "file-loader" },
       { test: /\.svg$/, loader: "file-loader" },
       { test: /\.otf$/, loader: "file-loader" },
+      { test: /\.json$/, loader: "json-loader" }
     ]
   }
 };

@@ -1,6 +1,8 @@
 'use strict';
 
+require( './style.css' );
 var React = require( 'react' );
+
 var quotes = [
   { id: 1, name: 'First Quote' },
   { id: 2, name: 'Second Quote' },
@@ -14,12 +16,13 @@ var CheckableQuote = React.createClass( {
     return { checked: false };
   },
 
-  isChecked: function( ) {
+  isChecked: function() {
     return this.state.checked;
   },
 
   checkHandler: function() {
-    this.setState( {checked: !this.state.checked })
+    this.setState( { checked: !this.state.checked } );
+    this.props.onChecked( this.props.quote, this.state.checked );
   },
 
   checkIcon: function() {
@@ -34,19 +37,45 @@ var CheckableQuote = React.createClass( {
   }
 } );
 
+var Summary = React.createClass( {
+  render: function() {
+    return <div>{this.props.checkedCount} Selected</div>
+  }
+} );
+
 var QuoteList = React.createClass( {
+
+  getInitialState: function() {
+    return { checked: {} }
+  },
+
+  handleQuoteChecked: function( q, check ) {
+    var checked = this.state.checked;
+    if ( check ) {
+      delete checked[q.id];
+    }
+    else {
+      checked[q.id] = true;
+    }
+    this.setState( { checked: checked } );
+  },
+
+  checkedCount: function() {
+    return Object.keys( this.state.checked ).length;
+  },
 
   render: function() {
     return (
       <div>
         <ul>{this.renderQuotes()}</ul>
+        <Summary checkedCount={this.checkedCount()}/>
       </div>
     );
   },
 
   renderQuotes: function(){
     return this.props.quotes.map( ( q ) => (
-      <CheckableQuote quote={q} />
+      <CheckableQuote quote={q} onChecked={this.handleQuoteChecked} />
     ) );
   }
 } );
