@@ -50,5 +50,5 @@
   /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
 }
 
-.icon-check-ok:before { content: '\e800'; } /* '' */
-.icon-check-empty:before { content: '\e801'; } /* '' */
+.icon-check:before { content: '\e800'; } /* '' */
+.icon-empty:before { content: '\e801'; } /* '' */

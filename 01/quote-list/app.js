@@ -1,6 +1,5 @@
 'use strict';
 
-require( './style.css' );
 var React = require( 'react' );
 
 var quotes = [
@@ -10,34 +9,28 @@ var quotes = [
   { id: 4, name: 'Forth Quote' },
 ];
 
-var CheckableQuote = React.createClass( {
+var CheckedLine = React.createClass( {
 
   getInitialState: function() {
     return { checked: false };
   },
 
-  isChecked: function() {
-    return this.state.checked;
-  },
-
-  checkHandler: function() {
-    this.setState( { checked: !this.state.checked } );
-    this.props.onChecked( this.props.quote, this.state.checked );
-  },
-
-  checkIcon: function() {
-    return this.isChecked( ) ? 'icon-check-ok' : 'icon-check-empty';
+  handleClick: function() {
+    var toggledCheck = !this.state.checked;
+    this.setState( { checked: toggledCheck } );
+    this.props.onCheckChanged( this.props.id, toggledCheck );
   },
 
   render: function() {
-    var q = this.props.quote;
-    return <li onClick={this.checkHandler}>
-        <i className={this.checkIcon()}/> {q.id} {q.name}
-      </li>;
+    var icon = this.state.checked ? 'icon-check' : 'icon-empty';
+    return <li onClick={this.handleClick}>
+      <i className={icon}/> {this.props.children}
+    </li>;
   }
 } );
 
 var Summary = React.createClass( {
+
   render: function() {
     return <div>{this.props.checkedCount} Selected</div>
   }
@@ -46,39 +39,38 @@ var Summary = React.createClass( {
 var QuoteList = React.createClass( {
 
   getInitialState: function() {
-    return { checked: {} }
+    return { checkedStatus: {} };
   },
 
-  handleQuoteChecked: function( q, check ) {
-    var checked = this.state.checked;
-    if ( check ) {
-      delete checked[q.id];
-    }
-    else {
-      checked[q.id] = true;
-    }
-    this.setState( { checked: checked } );
-  },
-
-  checkedCount: function() {
-    return Object.keys( this.state.checked ).length;
+  getCheckedQuotes: function() {
+    return Object.keys( this.state.checkedStatus )
+      .filter( k => this.state.checkedStatus[k] )
+      .length;
   },
 
   render: function() {
-    return (
-      <div>
-        <ul>{this.renderQuotes()}</ul>
-        <Summary checkedCount={this.checkedCount()}/>
-      </div>
-    );
+    return <div>
+      <ul>{this.renderQuotes()}</ul>
+      <Summary checkedCount={this.getCheckedQuotes()}/>
+    </div>;
   },
 
-  renderQuotes: function(){
-    return this.props.quotes.map( ( q ) => (
-      <CheckableQuote quote={q} onChecked={this.handleQuoteChecked} />
+  handleCheckChanged: function( id, checked ) {
+    var checkedStatus = this.state.checkedStatus;
+    checkedStatus[id] = checked;
+    this.setState( { checkedStatus: checkedStatus } );
+  },
+
+  renderQuotes: function() {
+    return this.props.quotes.map( (q) => (
+      <CheckedLine id={q.id} onCheckChanged={this.handleCheckChanged}>
+        {q.id} {q.name}
+      </CheckedLine>
     ) );
   }
 } );
 
-
-React.render( <QuoteList quotes={quotes}/>, document.body );
+React.render(
+  <QuoteList quotes={quotes}/>,
+  document.body
+);

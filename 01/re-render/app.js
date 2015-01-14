@@ -1,6 +1,5 @@
 'use strict';
 
-require( './style.css' );
 var React = require( 'react' );
 var QuoteApi = require( './QuoteApi' );
 
@@ -8,7 +7,7 @@ var QuoteList = React.createClass( {
   render: function() {
     return (<table>
       <thead>
-        <tr><th>Id</th><th>Name</th><th>Country</th></tr>
+        <tr><th>Id</th><th>Name</th><th>Status</th></tr>
       </thead>
       <tbody>
         {this.renderQuotes()}
@@ -21,7 +20,7 @@ var QuoteList = React.createClass( {
       return <tr key={q.id}>
         <td>{q.id}</td>
         <td>{q.name}</td>
-        <td>{q.country}</td>
+        <td>{q.status}</td>
       </tr>
     } );
   }
@@ -34,11 +33,11 @@ var App = React.createClass( {
   },
 
   componentDidMount: function() {
-    setInterval( function() {
-      this.setState( { quotes: QuoteApi.get( 200 ).sort( function( q1, q2 ) {
-        return q1.country.localeCompare( q2.country );
-      } ) } );
-    }.bind( this ), 100 );
+    setInterval( ()=>{
+      var newQuotes = QuoteApi.get( 200 )
+        .sort( (q1,q2)=> q1.status.localeCompare( q2.status ) );
+      this.setState( { quotes: newQuotes } );
+    }, 1000 );
   },
 
   render: function( ) {
