@@ -17,44 +17,15 @@ var summaryStyle = {
   backgroundColor: '#eee'
 };
 
-var quotes = [
-  { id: 1, name: 'First Quote', status: 'New' },
-  { id: 2, name: 'Second Quote', status: 'New' },
-  { id: 3, name: 'Third Quote', status: 'New' },
-  { id: 4, name: 'Forth Quote', status: 'New' },
-];
-
 var StatusUtils = {
-  isNew: function( status ) {
-    return status === 'New';
-  },
-  isSent: function( status ) {
-    return status === 'Sent';
-  },
-  isClosed: function( status ) {
-    return status === 'Closed';
-  },
-
-  next: function( status ) {
-    if ( this.isNew( status ) ) {
-      return 'Sent';
-    }
-    if ( this.isSent( status ) ) {
-      return 'Closed';
-    }
-    throw new Error( 'invalid status' );
-  },
-
-  nextText: function( status ) {
-    if ( this.isNew( status ) ) {
-      return 'Send';
-    }
-    if ( this.isSent( status ) ) {
-      return 'Close';
-    }
-    throw new Error( 'invalid status' );
-  }
-}
+  isNew: ( status ) => status === 'New',
+  isSent: ( status ) => status === 'Sent',
+  isClosed: ( status ) => status === 'Closed',
+  next: ( status ) => (
+    StatusUtils.isNew( status ) ? 'Sent' :
+    StatusUtils.isSent( status ) ? 'Closed' : null
+  )
+};
 
 function getStatusSummary( quotes ) {
   return quotes.reduce( function( sum, q ) {
@@ -71,6 +42,21 @@ function getStatusSummary( quotes ) {
   }, { newCount: 0, sentCount: 0, closedCount: 0 } );
 }
 
+var quotes = [
+  { id: 1, name: 'First Quote', status: 'New' },
+  { id: 2, name: 'Second Quote', status: 'New' },
+  { id: 3, name: 'Third Quote', status: 'New' },
+  { id: 4, name: 'Forth Quote', status: 'New' },
+];
+
+var LinkButton = React.createClass( {
+
+  render: function( ) {
+    return <button style={linkButtonStyle} onClick={this.props.onClick}>
+      {this.props.children}
+    </button>
+  }
+} );
 
 var QuoteListItem = React.createClass( {
 
@@ -96,17 +82,21 @@ var QuoteListItem = React.createClass( {
 
   getNextStatusText: function() {
     var quote = this.props.quote;
-    return StatusUtils.nextText( quote.status );
+    return { New: 'Send', Sent: 'Close' }[quote.status];
   },
 
   render: function() {
     var q = this.props.quote;
+    var nextStatusText = this.getNextStatusText();
 
     return <li>
         {q.name} &mdash; <small>{q.status}</small>
-        <button onClick={this.handleStatusButtonClick} style={linkButtonStyle}>
-          {this.getNextStatusText()}
-        </button>
+        {
+          nextStatusText &&
+          <LinkButton onClick={this.handleStatusButtonClick}>
+            {nextStatusText}
+          </LinkButton>
+        }
       </li>;
   }
 } );
@@ -131,9 +121,9 @@ var Summary = React.createClass( {
       {this.props.statusSummary.newCount} New Quotes, { }
       {this.props.statusSummary.sentCount} Sent Quotes and { }
       {this.props.statusSummary.closedCount} Closed Quotes
-      <button onClick={this.handleCloseAllQuotes} style={linkButtonStyle}>
+      <LinkButton onClick={this.handleCloseAllQuotes}>
       Close All
-      </button>
+      </LinkButton>
     </div>;
   }
 } );
@@ -148,7 +138,6 @@ var QuoteList = React.createClass( {
 
   renderQuotes: function() {
     return this.props.quotes
-      .filter( q => q.status !== 'Closed' )
       .map( (q) => (
         <QuoteListItem quote={q} onQuoteChanged={this.props.onQuoteChanged} />
       ) );
@@ -194,3 +183,4 @@ var App = React.createClass( {
 } );
 
 React.render( <App/>, document.body );
+

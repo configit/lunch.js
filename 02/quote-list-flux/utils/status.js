@@ -5,19 +5,11 @@ var SENT = 'Sent';
 var CLOSED = 'Closed';
 
 module.exports = {
-  isNew: function( status ) { return status === NEW; },
-
-  isSent: function( status ) { return status === SENT; },
-
-  isClosed: function( status ) { return status === CLOSED; },
-
-  next: function( status ) {
-    if ( status === NEW ) {
-      return SENT;
-    }
-    if ( status === SENT ) {
-      return CLOSED;
-    }
-    throw new Error( 'invalid status' );
-  }
+  isNew: ( status ) => status === 'New',
+  isSent: ( status ) => status === 'Sent',
+  isClosed: ( status ) => status === 'Closed',
+  next: ( status ) => (
+    StatusUtils.isNew( status ) ? 'Sent' :
+    StatusUtils.isSent( status ) ? 'Closed' : null
+  )
 };
