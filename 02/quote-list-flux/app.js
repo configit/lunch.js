@@ -1,14 +1,19 @@
 'use strict';
 
 var React = require( 'react' );
+
 var QuoteStore = require( './stores/QuoteStore' );
+var InstanceStore = require( './stores/InstanceStore' );
+
 var Summary = require( './components/Summary' );
 var QuoteList = require( './components/QuoteList' );
+var InstanceList = require( './components/InstanceList' );
 
 function getStateFromStores() {
   return {
     quotes: QuoteStore.getAll(),
-    statusSummary: QuoteStore.getStatusSummary( )
+    statusSummary: QuoteStore.getStatusSummary( ),
+    sceInstances: InstanceStore.getAll()
   };
 }
 
@@ -35,6 +40,7 @@ var App = React.createClass( {
       <div>
         <Summary statusSummary={this.state.statusSummary}/>
         <QuoteList quotes={this.state.quotes}/>
+        <InstanceList sceInstances={this.state.sceInstances}/>
       </div>
     );
   }
