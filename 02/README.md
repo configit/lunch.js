@@ -7,7 +7,7 @@ To run examples:
 * Run `node server.js` 
 * Open http://localhost:8080
 
-Slides [here](https://docs.google.com/a/configit.com/presentation/d/1KaTFsO09C5SOxt62B6ZkQ_ylj_iDlLaA6a9axyp8sv0/edit?usp=sharing)
+Slides [here](https://docs.google.com/a/configit.com/presentation/d/1IEZOEWlfPuTcxignx9l-iXhC1FfkpfbUGP6Thl9D2f4/edit#slide=id.p)
 
 
 
