@@ -5,6 +5,7 @@ This repository is for keeping resources and discussions around the LunchJS sess
 ## Sessions
 * [React](https://github.com/configit/lunch.js/issues/2)
 * [React and Flux](https://github.com/configit/lunch.js/issues/3)
+* [ClojureScript](https://github.com/configit/lunch.js/issues/13)
 
 ## Ideas for sessions
 
@@ -18,7 +19,6 @@ This repository is for keeping resources and discussions around the LunchJS sess
 * [Static typing in Javascript](https://github.com/configit/lunch.js/issues/10)
 * [Css for grownups](https://github.com/configit/lunch.js/issues/11)
 * [Service Worker](https://github.com/configit/lunch.js/issues/12)
-* [ClojureScript](https://github.com/configit/lunch.js/issues/13)
 * [Om](https://github.com/configit/lunch.js/issues/14)
 * [Css animations](https://github.com/configit/lunch.js/issues/15)
 * [SVG](https://github.com/configit/lunch.js/issues/16)
