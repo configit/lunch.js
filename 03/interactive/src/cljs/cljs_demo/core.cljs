@@ -1,5 +1,5 @@
 (ns cljs-demo.core
-  (:use [cljs-demo.lib :only (dom replace-dom by-id)]))
+  (:use [cljs-demo.lib :only (dom replace-dom)]))
 
 (def state-atom (atom {:quotes [{:id 1 :name "First Quote"  :status "New"}
                                  {:id 2 :name "Second Quote" :status "New"}
@@ -28,6 +28,20 @@
 
 (defn read-state [js-state]
   (transact! (fn [_] (js->clj js-state :keywordize-keys true))))
+
+(defn snapshot []
+  (let [js-state (clj->js @state-atom)
+        state-str (.stringify js/JSON js-state)]
+    (aset js/window.localStorage "snapshot" state-str)
+  ))
+
+(defn restore-snapshot []
+  (when-let [snapshot-str (aget js/window.localStorage "snapshot")]
+    (let [snapshot (.parse js/JSON snapshot-str)]
+      (transact! (fn [_] (js->clj snapshot :keywordize-keys true))))))
+
+(defn clear-snapshot []
+  (.removeItem js/window.localStorage "snapshot"))
 
 (defn isX [x status] (= x status))
 

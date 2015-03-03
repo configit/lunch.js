@@ -47102,6 +47102,28 @@ cljs_demo.core.read_state = function read_state(js_state) {
     return cljs.core.js__GT_clj.call(null, js_state, new cljs.core.Keyword(null, "keywordize-keys", "keywordize-keys", 1310784252), true);
   });
 };
+cljs_demo.core.snapshot = function snapshot() {
+  var js_state = cljs.core.clj__GT_js.call(null, cljs.core.deref.call(null, cljs_demo.core.state_atom));
+  var state_str = JSON.stringify(js_state);
+  return window.localStorage["snapshot"] = state_str;
+};
+cljs_demo.core.restore_snapshot = function restore_snapshot() {
+  var temp__4126__auto__ = window.localStorage["snapshot"];
+  if (cljs.core.truth_(temp__4126__auto__)) {
+    var snapshot_str = temp__4126__auto__;
+    var snapshot = JSON.parse(snapshot_str);
+    return cljs_demo.core.transact_BANG_.call(null, function(snapshot, snapshot_str, temp__4126__auto__) {
+      return function(_) {
+        return cljs.core.js__GT_clj.call(null, snapshot, new cljs.core.Keyword(null, "keywordize-keys", "keywordize-keys", 1310784252), true);
+      };
+    }(snapshot, snapshot_str, temp__4126__auto__));
+  } else {
+    return null;
+  }
+};
+cljs_demo.core.clear_snapshot = function clear_snapshot() {
+  return window.localStorage.removeItem("snapshot");
+};
 cljs_demo.core.isX = function isX(x, status) {
   return cljs.core._EQ_.call(null, x, status);
 };
@@ -47109,21 +47131,21 @@ cljs_demo.core.isNew = cljs.core.partial.call(null, cljs_demo.core.isX, "New");
 cljs_demo.core.isSent = cljs.core.partial.call(null, cljs_demo.core.isX, "Sent");
 cljs_demo.core.isClosed = cljs.core.partial.call(null, cljs_demo.core.isX, "Closed");
 cljs_demo.core.get_status_summary = function get_status_summary(quotes) {
-  return new cljs.core.PersistentArrayMap(null, 3, [new cljs.core.Keyword(null, "newCount", "newCount", 253903917), cljs.core.count.call(null, cljs.core.filter.call(null, function(p1__9941_SHARP_) {
-    return cljs_demo.core.isNew.call(null, (new cljs.core.Keyword(null, "status", "status", -1997798413)).cljs$core$IFn$_invoke$arity$1(p1__9941_SHARP_));
-  }, quotes)), new cljs.core.Keyword(null, "sentCount", "sentCount", 447976836), cljs.core.count.call(null, cljs.core.filter.call(null, function(p1__9942_SHARP_) {
-    return cljs_demo.core.isSent.call(null, (new cljs.core.Keyword(null, "status", "status", -1997798413)).cljs$core$IFn$_invoke$arity$1(p1__9942_SHARP_));
-  }, quotes)), new cljs.core.Keyword(null, "closedCount", "closedCount", -887787208), cljs.core.count.call(null, cljs.core.filter.call(null, function(p1__9943_SHARP_) {
-    return cljs_demo.core.isClosed.call(null, (new cljs.core.Keyword(null, "status", "status", -1997798413)).cljs$core$IFn$_invoke$arity$1(p1__9943_SHARP_));
+  return new cljs.core.PersistentArrayMap(null, 3, [new cljs.core.Keyword(null, "newCount", "newCount", 253903917), cljs.core.count.call(null, cljs.core.filter.call(null, function(p1__10162_SHARP_) {
+    return cljs_demo.core.isNew.call(null, (new cljs.core.Keyword(null, "status", "status", -1997798413)).cljs$core$IFn$_invoke$arity$1(p1__10162_SHARP_));
+  }, quotes)), new cljs.core.Keyword(null, "sentCount", "sentCount", 447976836), cljs.core.count.call(null, cljs.core.filter.call(null, function(p1__10163_SHARP_) {
+    return cljs_demo.core.isSent.call(null, (new cljs.core.Keyword(null, "status", "status", -1997798413)).cljs$core$IFn$_invoke$arity$1(p1__10163_SHARP_));
+  }, quotes)), new cljs.core.Keyword(null, "closedCount", "closedCount", -887787208), cljs.core.count.call(null, cljs.core.filter.call(null, function(p1__10164_SHARP_) {
+    return cljs_demo.core.isClosed.call(null, (new cljs.core.Keyword(null, "status", "status", -1997798413)).cljs$core$IFn$_invoke$arity$1(p1__10164_SHARP_));
   }, quotes))], null);
 };
 cljs_demo.core.nextStatus = function nextStatus(status) {
-  var pred__9947 = cljs.core._EQ_;
-  var expr__9948 = status;
-  if (cljs.core.truth_(pred__9947.call(null, "New", expr__9948))) {
+  var pred__10168 = cljs.core._EQ_;
+  var expr__10169 = status;
+  if (cljs.core.truth_(pred__10168.call(null, "New", expr__10169))) {
     return "Sent";
   } else {
-    if (cljs.core.truth_(pred__9947.call(null, "Sent", expr__9948))) {
+    if (cljs.core.truth_(pred__10168.call(null, "Sent", expr__10169))) {
       return "Closed";
     } else {
       return "";
@@ -47131,12 +47153,12 @@ cljs_demo.core.nextStatus = function nextStatus(status) {
   }
 };
 cljs_demo.core.nextAction = function nextAction(status) {
-  var pred__9953 = cljs.core._EQ_;
-  var expr__9954 = status;
-  if (cljs.core.truth_(pred__9953.call(null, "New", expr__9954))) {
+  var pred__10174 = cljs.core._EQ_;
+  var expr__10175 = status;
+  if (cljs.core.truth_(pred__10174.call(null, "New", expr__10175))) {
     return "Send";
   } else {
-    if (cljs.core.truth_(pred__9953.call(null, "Sent", expr__9954))) {
+    if (cljs.core.truth_(pred__10174.call(null, "Sent", expr__10175))) {
       return "Close";
     } else {
       return "";
