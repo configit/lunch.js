@@ -1,4 +1,5 @@
 (ns cljs-demo.lib
+  (:require-macros [cljs-demo.macros :refer [$]])
   (:require [goog.net.Jsonp]
             [goog.Uri]
             [cljs.core.async :as async :refer [chan put!]]
@@ -75,7 +76,6 @@
 
 (defn by-id [id]
   (.getElementById js/document id))
-
 
 (defn replace-dom [id elements]
   (let [elem ($ id)]

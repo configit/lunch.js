@@ -47131,21 +47131,21 @@ cljs_demo.core.isNew = cljs.core.partial.call(null, cljs_demo.core.isX, "New");
 cljs_demo.core.isSent = cljs.core.partial.call(null, cljs_demo.core.isX, "Sent");
 cljs_demo.core.isClosed = cljs.core.partial.call(null, cljs_demo.core.isX, "Closed");
 cljs_demo.core.get_status_summary = function get_status_summary(quotes) {
-  return new cljs.core.PersistentArrayMap(null, 3, [new cljs.core.Keyword(null, "newCount", "newCount", 253903917), cljs.core.count.call(null, cljs.core.filter.call(null, function(p1__10162_SHARP_) {
-    return cljs_demo.core.isNew.call(null, (new cljs.core.Keyword(null, "status", "status", -1997798413)).cljs$core$IFn$_invoke$arity$1(p1__10162_SHARP_));
-  }, quotes)), new cljs.core.Keyword(null, "sentCount", "sentCount", 447976836), cljs.core.count.call(null, cljs.core.filter.call(null, function(p1__10163_SHARP_) {
-    return cljs_demo.core.isSent.call(null, (new cljs.core.Keyword(null, "status", "status", -1997798413)).cljs$core$IFn$_invoke$arity$1(p1__10163_SHARP_));
-  }, quotes)), new cljs.core.Keyword(null, "closedCount", "closedCount", -887787208), cljs.core.count.call(null, cljs.core.filter.call(null, function(p1__10164_SHARP_) {
-    return cljs_demo.core.isClosed.call(null, (new cljs.core.Keyword(null, "status", "status", -1997798413)).cljs$core$IFn$_invoke$arity$1(p1__10164_SHARP_));
+  return new cljs.core.PersistentArrayMap(null, 3, [new cljs.core.Keyword(null, "newCount", "newCount", 253903917), cljs.core.count.call(null, cljs.core.filter.call(null, function(p1__10418_SHARP_) {
+    return cljs_demo.core.isNew.call(null, (new cljs.core.Keyword(null, "status", "status", -1997798413)).cljs$core$IFn$_invoke$arity$1(p1__10418_SHARP_));
+  }, quotes)), new cljs.core.Keyword(null, "sentCount", "sentCount", 447976836), cljs.core.count.call(null, cljs.core.filter.call(null, function(p1__10419_SHARP_) {
+    return cljs_demo.core.isSent.call(null, (new cljs.core.Keyword(null, "status", "status", -1997798413)).cljs$core$IFn$_invoke$arity$1(p1__10419_SHARP_));
+  }, quotes)), new cljs.core.Keyword(null, "closedCount", "closedCount", -887787208), cljs.core.count.call(null, cljs.core.filter.call(null, function(p1__10420_SHARP_) {
+    return cljs_demo.core.isClosed.call(null, (new cljs.core.Keyword(null, "status", "status", -1997798413)).cljs$core$IFn$_invoke$arity$1(p1__10420_SHARP_));
   }, quotes))], null);
 };
 cljs_demo.core.nextStatus = function nextStatus(status) {
-  var pred__10168 = cljs.core._EQ_;
-  var expr__10169 = status;
-  if (cljs.core.truth_(pred__10168.call(null, "New", expr__10169))) {
+  var pred__10424 = cljs.core._EQ_;
+  var expr__10425 = status;
+  if (cljs.core.truth_(pred__10424.call(null, "New", expr__10425))) {
     return "Sent";
   } else {
-    if (cljs.core.truth_(pred__10168.call(null, "Sent", expr__10169))) {
+    if (cljs.core.truth_(pred__10424.call(null, "Sent", expr__10425))) {
       return "Closed";
     } else {
       return "";
@@ -47153,12 +47153,12 @@ cljs_demo.core.nextStatus = function nextStatus(status) {
   }
 };
 cljs_demo.core.nextAction = function nextAction(status) {
-  var pred__10174 = cljs.core._EQ_;
-  var expr__10175 = status;
-  if (cljs.core.truth_(pred__10174.call(null, "New", expr__10175))) {
+  var pred__10430 = cljs.core._EQ_;
+  var expr__10431 = status;
+  if (cljs.core.truth_(pred__10430.call(null, "New", expr__10431))) {
     return "Send";
   } else {
-    if (cljs.core.truth_(pred__10174.call(null, "Sent", expr__10175))) {
+    if (cljs.core.truth_(pred__10430.call(null, "Sent", expr__10431))) {
       return "Close";
     } else {
       return "";

@@ -3,45 +3,51 @@
                    [cljs-demo.macros :refer [$]]
                    )
   (:require [clojure.string :as string]
-            [cljs.core.async :as async :refer [chan <! >! put! timeout]])
-  (:use [cljs-demo.lib :only (dom jsonp by-id)]))
+            [cljs.core.async :as async :refer [sliding-buffer chan <! >! put! take! timeout]])
+  (:use [cljs-demo.lib :only (replace-dom dom jsonp by-id)]))
 
-(declare render-state)
+(def state-atom (atom {:quotes [{:id 1 :name "First Quote"  :status "New"}
+                                 {:id 2 :name "Second Quote" :status "New"}
+                                 {:id 3 :name "Third Quote"  :status "New"}
+                                 {:id 4 :name "Forth Quote"  :status "New"}]
+                       :filter ""
+                      }))
 
-(defn replace-dom [id elements]
-  (let [elem ($ id)]
-    (if-let [oldChildren (aget elem "children")]
-      (loop [oldChild (aget (aget elem "children") 0)]
-        (if oldChild
-          (do (.removeChild elem oldChild)
-              (recur (aget (aget elem "children") 0))))))
-    (doseq [child elements]
-      (.appendChild elem child))))
+(def history (atom nil))
 
-(defn insert-dom [elements]
-  (replace-dom :#app-root elements))
+(declare render)
 
-(def ch (chan))
+(defn transact! [state-fn]
+  (let [old-state @state-atom]
+    (swap! history (fn [old-history] (cons @state-atom old-history)))
+    (swap! state-atom state-fn)
+    (render @state-atom)))
 
-(def state-atom (atom
-                 {:quotes [{:id 1 :name "First Quote"  :status "New"}
-                           {:id 2 :name "Second Quote" :status "New"}
-                           {:id 3 :name "Third Quote"  :status "New"}
-                           {:id 4 :name "Forth Quote"  :status "New"}]}))
+(defn undo! []
+  (if-let [prev-state (first @history)]
+    (do
+      (swap! history (fn [old-hist] (rest old-hist)))
+      (swap! state-atom (fn [_] prev-state))
+      (render @state-atom))
+    (.alert js/window "No history to undo")
+  ))
 
-(defn trans-state [state-fun]
-  (let [old-state @state-atom
-        new-state (state-fun old-state)]
-    (async/put! ch {:old-state old-state :new-state new-state})))
+(defn read-state [js-state]
+  (transact! (fn [_] (js->clj js-state :keywordize-keys true))))
 
-(defn undo-state []
-  (async/put! ch :undo))
+(defn snapshot []
+  (let [js-state (clj->js @state-atom)
+        state-str (.stringify js/JSON js-state)]
+    (aset js/window.localStorage "snapshot" state-str)
+  ))
 
-(def base-url
-  "http://en.wikipedia.org/w/api.php?action=opensearch&format=json&search=")
+(defn restore-snapshot []
+  (when-let [snapshot-str (aget js/window.localStorage "snapshot")]
+    (let [snapshot (.parse js/JSON snapshot-str)]
+      (transact! (fn [_] (js->clj snapshot :keywordize-keys true))))))
 
-(defn rand-status []
-  (rand-nth ["New" "Sent" "Closed"]))
+(defn clear-snapshot []
+  (.removeItem js/window.localStorage "snapshot"))
 
 (defn isX [x status] (= x status))
 
@@ -81,37 +87,61 @@
                :on-click onclick}
       elem]))
 
-(defn trans-quote [quote state]
-  (let [qs (:quotes state)]
-      (assoc state :quotes
-            (replace {quote (assoc quote :status (nextStatus (:status quote)))}
-                     qs))))
-
 (defn quote [quote]
   [:li
    (:name quote) " — "
-   [:small (:status quote)]
+   [:small {:id (:id quote)}(:status quote)]
    (linkButton [:span (nextAction (:status quote))]
-               (fn [_] (trans-state (partial trans-quote quote))))])
+      (fn [_]
+        (transact!
+          (fn [state]
+            (assoc state :quotes
+              (replace
+                {quote (assoc quote :status (nextStatus (:status quote)))}
+                (:quotes state)))))
+      )
+   )])
+
+(defn filter-quotes [v quotes]
+  (filter (fn [q] (or (string/blank? v)
+                      (re-find (re-pattern (string/upper-case v)) (-> q :name string/upper-case))))
+          quotes))
+
+(def base-url "http://en.wikipedia.org/w/api.php?action=opensearch&format=json&search=")
 
 (defn quote-list [quote-list]
-  (if (empty? quote-list)
-    [:div [:h2 {:style {:color "#c0c0c0" :text-align "center" }} "Nothing is here?"]]
-    [:ul#the-quote-list.some-class (map quote quote-list)]))
+  (let [ch (chan)
+        wiki-ch (chan (sliding-buffer 1))
+        filtered-quotes (filter-quotes (:filter @state-atom) quote-list)]
+    (go-loop []
+      (let [v (<! ch)]
+        (transact!
+          (fn [state]
+            (assoc state :filter v)))
+        (.focus ($ :#quote-filter))
+        (recur)))
+    (go-loop []
+      (let [v (<! wiki-ch)
+            [_ names] (<! (jsonp (str base-url v)))]
+        (.log js/console "Got names" names)
+        (recur)
+      ))
+    [:div
+      (if (empty? filtered-quotes)
+        [:h2 {:style {:color "#c0c0c0" :text-align "center" }} "Nothing is here?"]
+        [:ul (map quote filtered-quotes)])
+      [:input#quote-filter {:value (:filter @state-atom)
+                            :on-keyup (fn [e] (put! ch (aget ($ :#quote-filter) "value")))}]
+      [:input#wiki-query {:on-keyup (fn [e] (put! wiki-ch (aget ($ :#wiki-query) "value")))}]
+    ]))
 
-(defn closeable [status]
-  (or (= "New" status)
-      (= "Sent" status)))
 
-(defn close-all-quotes [quotes state]
-  (let [quotes (:quotes state)]
-    (assoc state
-      :quotes
-      (map (fn [q]
-             (if (closeable (:status q))
-               (assoc q :status "Closed")
-               q))
-           quotes))))
+(defn close-quote [quote]
+  (assoc quote :status "Closed"))
+
+(defn close-all-quotes [state]
+  (assoc state :quotes
+    (map close-quote (:quotes state))))
 
 (defn summary [quotes]
   (let [status-summary (get-status-summary quotes)]
@@ -125,74 +155,16 @@
      (:newCount status-summary) " New Quotes, "
      (:sentCount status-summary) " Sent Quotes, and "
      (:closedCount status-summary) " Closed Quotes"
-     (linkButton "Close All" (fn [_]
-                               (trans-state
-                                (partial close-all-quotes quotes))))]))
+     (linkButton "Close All"
+        (fn [_] (transact! close-all-quotes)))
+     ]))
 
-(defn query-wiki [n query]
-  (let [out (chan)]
-    (go
-      (let [[_ names] (<! (jsonp (str base-url query)))]
-        (>! out (take n names))))
-    out))
-
-(defn wiki-search []
-  [:div
-   [:input {:type "text" :id "my-inp"}]
-   [:input {:style {:width "42px"} :type "number" :id "my-num"}]
-   (linkButton
-    [:small "Populate from Wikipedia"]
-    (fn [_]
-      (let [val (.-value ($ :#my-inp))
-            n   (->> ($ :#my-num)
-                     .-value
-                     js/parseInt)]
-        (go (let [names (<! (query-wiki n val))]
-              (do
-                (trans-state
-                 (fn [old-state]
-                   (assoc old-state :quotes [])))
-                (<! (timeout 1000))
-                (trans-state
-                 (fn [old-state]
-                   (assoc old-state :quotes
-                          (map-indexed (fn [idx name] {:id idx
-                                                       :name name
-                                                       :status (rand-status)})
-                                       names))))))))))])
-
-(defn render-state [state]
+(defn app-view [state]
   (dom [:div
-        (linkButton
-         [:small "Undo"]
-         (fn [_] (undo-state)))
         (summary (:quotes state))
-        (quote-list (:quotes state))
-        (wiki-search)
-        ]))
+        (quote-list (:quotes state))]))
 
+(defn render [state]
+  (replace-dom :#app-root (app-view state)))
 
-(defn refresh-page [state]
-  (insert-dom (render-state state)))
-
-(refresh-page @state-atom)
-
-(go-loop [state-hist nil]
-  (let [state-op (<! ch)]
-    (cond
-     (and (= :undo state-op)
-          (<= 1 (count state-hist))) (let [prev-state (first state-hist)]
-                                       (do
-                                         (swap! state-atom (fn [_] prev-state))
-                                         (refresh-page prev-state)
-                                         (recur (rest state-hist))))
-     (map? state-op) (let [new-state (:new-state state-op)
-                           old-state (:old-state state-op)]
-                       (swap! state-atom (fn [_] new-state))
-                       (-> new-state
-                           render-state
-                           insert-dom)
-                       (if (= new-state old-state)
-                         (recur state-hist)
-                         (recur (cons old-state state-hist))))
-     :else (recur state-hist))))
+(render @state-atom)
