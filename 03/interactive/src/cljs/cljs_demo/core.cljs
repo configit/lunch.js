@@ -1,5 +1,33 @@
 (ns cljs-demo.core
-  (:use [cljs-demo.lib :only (dom replace-dom)]))
+  (:use [cljs-demo.lib :only (dom replace-dom by-id)]))
+
+(def state-atom (atom {:quotes [{:id 1 :name "First Quote"  :status "New"}
+                                 {:id 2 :name "Second Quote" :status "New"}
+                                 {:id 3 :name "Third Quote"  :status "New"}
+                                 {:id 4 :name "Forth Quote"  :status "New"}]
+                      }))
+
+(def history (atom nil))
+
+(declare render)
+
+(defn transact! [state-fn]
+  (let [old-state @state-atom]
+    (swap! history (fn [old-history] (cons @state-atom old-history)))
+    (swap! state-atom state-fn)
+    (render @state-atom)))
+
+(defn undo! []
+  (if-let [prev-state (first @history)]
+    (do
+      (swap! history (fn [old-hist] (rest old-hist)))
+      (swap! state-atom (fn [_] prev-state))
+      (render @state-atom))
+    (.alert js/window "No history to undo")
+  ))
+
+(defn read-state [js-state]
+  (transact! (fn [_] (js->clj js-state :keywordize-keys true))))
 
 (defn isX [x status] (= x status))
 
@@ -42,13 +70,29 @@
 (defn quote [quote]
   [:li
    (:name quote) " — "
-   [:small (:status quote)]
-   (linkButton [:span (nextAction (:status quote))])])
+   [:small {:id (:id quote)}(:status quote)]
+   (linkButton [:span (nextAction (:status quote))]
+      (fn [_]
+        (transact!
+          (fn [state]
+            (assoc state :quotes
+              (replace
+                {quote (assoc quote :status (nextStatus (:status quote)))}
+                (:quotes state)))))
+      )
+   )])
 
 (defn quote-list [quote-list]
   (if (empty? quote-list)
     [:div [:h2 {:style {:color "#c0c0c0" :text-align "center" }} "Nothing is here?"]]
     [:ul (map quote quote-list)]))
+
+(defn close-quote [quote]
+  (assoc quote :status "Closed"))
+
+(defn close-all-quotes [state]
+  (assoc state :quotes
+    (map close-quote (:quotes state))))
 
 (defn summary [quotes]
   (let [status-summary (get-status-summary quotes)]
@@ -62,7 +106,9 @@
      (:newCount status-summary) " New Quotes, "
      (:sentCount status-summary) " Sent Quotes, and "
      (:closedCount status-summary) " Closed Quotes"
-     (linkButton "Close All")]))
+     (linkButton "Close All"
+        (fn [_] (transact! close-all-quotes)))
+     ]))
 
 (defn app-view [state]
   (dom [:div
@@ -72,9 +118,4 @@
 (defn render [state]
   (replace-dom :#app-root (app-view state)))
 
-(def state {:quotes [{:id 1 :name "First Quote"  :status "New"}
-                     {:id 2 :name "Second Quote" :status "New"}
-                     {:id 3 :name "Third Quote"  :status "New"}
-                     {:id 4 :name "Forth Quote"  :status "New"}]})
-
-(render state)
+(render @state-atom)

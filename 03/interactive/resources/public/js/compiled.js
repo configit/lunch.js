@@ -47064,6 +47064,44 @@ cljs_demo.lib.replace_dom = function replace_dom(id, elements) {
 goog.provide("cljs_demo.core");
 goog.require("cljs.core");
 goog.require("cljs_demo.lib");
+cljs_demo.core.state_atom = cljs.core.atom.call(null, new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null, "quotes", "quotes", -844987790), new cljs.core.PersistentVector(null, 4, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.PersistentArrayMap(null, 3, [new cljs.core.Keyword(null, "id", "id", -1388402092), 1, new cljs.core.Keyword(null, "name", "name", 1843675177), "First Quote", new cljs.core.Keyword(null, "status", "status", -1997798413), "New"], null), new cljs.core.PersistentArrayMap(null, 
+3, [new cljs.core.Keyword(null, "id", "id", -1388402092), 2, new cljs.core.Keyword(null, "name", "name", 1843675177), "Second Quote", new cljs.core.Keyword(null, "status", "status", -1997798413), "New"], null), new cljs.core.PersistentArrayMap(null, 3, [new cljs.core.Keyword(null, "id", "id", -1388402092), 3, new cljs.core.Keyword(null, "name", "name", 1843675177), "Third Quote", new cljs.core.Keyword(null, "status", "status", -1997798413), "New"], null), new cljs.core.PersistentArrayMap(null, 3, 
+[new cljs.core.Keyword(null, "id", "id", -1388402092), 4, new cljs.core.Keyword(null, "name", "name", 1843675177), "Forth Quote", new cljs.core.Keyword(null, "status", "status", -1997798413), "New"], null)], null)], null));
+cljs_demo.core.history = cljs.core.atom.call(null, null);
+cljs_demo.core.transact_BANG_ = function transact_BANG_(state_fn) {
+  var old_state = cljs.core.deref.call(null, cljs_demo.core.state_atom);
+  cljs.core.swap_BANG_.call(null, cljs_demo.core.history, function(old_state) {
+    return function(old_history) {
+      return cljs.core.cons.call(null, cljs.core.deref.call(null, cljs_demo.core.state_atom), old_history);
+    };
+  }(old_state));
+  cljs.core.swap_BANG_.call(null, cljs_demo.core.state_atom, state_fn);
+  return cljs_demo.core.render.call(null, cljs.core.deref.call(null, cljs_demo.core.state_atom));
+};
+cljs_demo.core.undo_BANG_ = function undo_BANG_() {
+  var temp__4124__auto__ = cljs.core.first.call(null, cljs.core.deref.call(null, cljs_demo.core.history));
+  if (cljs.core.truth_(temp__4124__auto__)) {
+    var prev_state = temp__4124__auto__;
+    cljs.core.swap_BANG_.call(null, cljs_demo.core.history, function(prev_state, temp__4124__auto__) {
+      return function(old_hist) {
+        return cljs.core.rest.call(null, old_hist);
+      };
+    }(prev_state, temp__4124__auto__));
+    cljs.core.swap_BANG_.call(null, cljs_demo.core.state_atom, function(prev_state, temp__4124__auto__) {
+      return function(_) {
+        return prev_state;
+      };
+    }(prev_state, temp__4124__auto__));
+    return cljs_demo.core.render.call(null, cljs.core.deref.call(null, cljs_demo.core.state_atom));
+  } else {
+    return window.alert("No history to undo");
+  }
+};
+cljs_demo.core.read_state = function read_state(js_state) {
+  return cljs_demo.core.transact_BANG_.call(null, function(_) {
+    return cljs.core.js__GT_clj.call(null, js_state, new cljs.core.Keyword(null, "keywordize-keys", "keywordize-keys", 1310784252), true);
+  });
+};
 cljs_demo.core.isX = function isX(x, status) {
   return cljs.core._EQ_.call(null, x, status);
 };
@@ -47071,21 +47109,21 @@ cljs_demo.core.isNew = cljs.core.partial.call(null, cljs_demo.core.isX, "New");
 cljs_demo.core.isSent = cljs.core.partial.call(null, cljs_demo.core.isX, "Sent");
 cljs_demo.core.isClosed = cljs.core.partial.call(null, cljs_demo.core.isX, "Closed");
 cljs_demo.core.get_status_summary = function get_status_summary(quotes) {
-  return new cljs.core.PersistentArrayMap(null, 3, [new cljs.core.Keyword(null, "newCount", "newCount", 253903917), cljs.core.count.call(null, cljs.core.filter.call(null, function(p1__19030_SHARP_) {
-    return cljs_demo.core.isNew.call(null, (new cljs.core.Keyword(null, "status", "status", -1997798413)).cljs$core$IFn$_invoke$arity$1(p1__19030_SHARP_));
-  }, quotes)), new cljs.core.Keyword(null, "sentCount", "sentCount", 447976836), cljs.core.count.call(null, cljs.core.filter.call(null, function(p1__19031_SHARP_) {
-    return cljs_demo.core.isSent.call(null, (new cljs.core.Keyword(null, "status", "status", -1997798413)).cljs$core$IFn$_invoke$arity$1(p1__19031_SHARP_));
-  }, quotes)), new cljs.core.Keyword(null, "closedCount", "closedCount", -887787208), cljs.core.count.call(null, cljs.core.filter.call(null, function(p1__19032_SHARP_) {
-    return cljs_demo.core.isClosed.call(null, (new cljs.core.Keyword(null, "status", "status", -1997798413)).cljs$core$IFn$_invoke$arity$1(p1__19032_SHARP_));
+  return new cljs.core.PersistentArrayMap(null, 3, [new cljs.core.Keyword(null, "newCount", "newCount", 253903917), cljs.core.count.call(null, cljs.core.filter.call(null, function(p1__9941_SHARP_) {
+    return cljs_demo.core.isNew.call(null, (new cljs.core.Keyword(null, "status", "status", -1997798413)).cljs$core$IFn$_invoke$arity$1(p1__9941_SHARP_));
+  }, quotes)), new cljs.core.Keyword(null, "sentCount", "sentCount", 447976836), cljs.core.count.call(null, cljs.core.filter.call(null, function(p1__9942_SHARP_) {
+    return cljs_demo.core.isSent.call(null, (new cljs.core.Keyword(null, "status", "status", -1997798413)).cljs$core$IFn$_invoke$arity$1(p1__9942_SHARP_));
+  }, quotes)), new cljs.core.Keyword(null, "closedCount", "closedCount", -887787208), cljs.core.count.call(null, cljs.core.filter.call(null, function(p1__9943_SHARP_) {
+    return cljs_demo.core.isClosed.call(null, (new cljs.core.Keyword(null, "status", "status", -1997798413)).cljs$core$IFn$_invoke$arity$1(p1__9943_SHARP_));
   }, quotes))], null);
 };
 cljs_demo.core.nextStatus = function nextStatus(status) {
-  var pred__19036 = cljs.core._EQ_;
-  var expr__19037 = status;
-  if (cljs.core.truth_(pred__19036.call(null, "New", expr__19037))) {
+  var pred__9947 = cljs.core._EQ_;
+  var expr__9948 = status;
+  if (cljs.core.truth_(pred__9947.call(null, "New", expr__9948))) {
     return "Sent";
   } else {
-    if (cljs.core.truth_(pred__19036.call(null, "Sent", expr__19037))) {
+    if (cljs.core.truth_(pred__9947.call(null, "Sent", expr__9948))) {
       return "Closed";
     } else {
       return "";
@@ -47093,12 +47131,12 @@ cljs_demo.core.nextStatus = function nextStatus(status) {
   }
 };
 cljs_demo.core.nextAction = function nextAction(status) {
-  var pred__19042 = cljs.core._EQ_;
-  var expr__19043 = status;
-  if (cljs.core.truth_(pred__19042.call(null, "New", expr__19043))) {
+  var pred__9953 = cljs.core._EQ_;
+  var expr__9954 = status;
+  if (cljs.core.truth_(pred__9953.call(null, "New", expr__9954))) {
     return "Send";
   } else {
-    if (cljs.core.truth_(pred__19042.call(null, "Sent", expr__19043))) {
+    if (cljs.core.truth_(pred__9953.call(null, "Sent", expr__9954))) {
       return "Close";
     } else {
       return "";
@@ -47128,8 +47166,13 @@ cljs_demo.core.linkButton = function() {
   return linkButton;
 }();
 cljs_demo.core.quote = function quote(quote__$1) {
-  return new cljs.core.PersistentVector(null, 5, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "li", "li", 723558921), (new cljs.core.Keyword(null, "name", "name", 1843675177)).cljs$core$IFn$_invoke$arity$1(quote__$1), " \u2014 ", new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "small", "small", 2133478704), (new cljs.core.Keyword(null, "status", "status", -1997798413)).cljs$core$IFn$_invoke$arity$1(quote__$1)], 
-  null), cljs_demo.core.linkButton.call(null, new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "span", "span", 1394872991), cljs_demo.core.nextAction.call(null, (new cljs.core.Keyword(null, "status", "status", -1997798413)).cljs$core$IFn$_invoke$arity$1(quote__$1))], null))], null);
+  return new cljs.core.PersistentVector(null, 5, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "li", "li", 723558921), (new cljs.core.Keyword(null, "name", "name", 1843675177)).cljs$core$IFn$_invoke$arity$1(quote__$1), " \u2014 ", new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "small", "small", 2133478704), new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null, "id", "id", -1388402092), (new cljs.core.Keyword(null, 
+  "id", "id", -1388402092)).cljs$core$IFn$_invoke$arity$1(quote__$1)], null), (new cljs.core.Keyword(null, "status", "status", -1997798413)).cljs$core$IFn$_invoke$arity$1(quote__$1)], null), cljs_demo.core.linkButton.call(null, new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "span", "span", 1394872991), cljs_demo.core.nextAction.call(null, (new cljs.core.Keyword(null, "status", "status", -1997798413)).cljs$core$IFn$_invoke$arity$1(quote__$1))], 
+  null), function(_) {
+    return cljs_demo.core.transact_BANG_.call(null, function(state) {
+      return cljs.core.assoc.call(null, state, new cljs.core.Keyword(null, "quotes", "quotes", -844987790), cljs.core.replace.call(null, new cljs.core.PersistentArrayMap.fromArray([quote__$1, cljs.core.assoc.call(null, quote__$1, new cljs.core.Keyword(null, "status", "status", -1997798413), cljs_demo.core.nextStatus.call(null, (new cljs.core.Keyword(null, "status", "status", -1997798413)).cljs$core$IFn$_invoke$arity$1(quote__$1)))], true, false), (new cljs.core.Keyword(null, "quotes", "quotes", -844987790)).cljs$core$IFn$_invoke$arity$1(state)));
+    });
+  })], null);
 };
 cljs_demo.core.quote_list = function quote_list(quote_list__$1) {
   if (cljs.core.empty_QMARK_.call(null, quote_list__$1)) {
@@ -47139,11 +47182,21 @@ cljs_demo.core.quote_list = function quote_list(quote_list__$1) {
     return new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "ul", "ul", -1349521403), cljs.core.map.call(null, cljs_demo.core.quote, quote_list__$1)], null);
   }
 };
+cljs_demo.core.close_quote = function close_quote(quote) {
+  return cljs.core.assoc.call(null, quote, new cljs.core.Keyword(null, "status", "status", -1997798413), "Closed");
+};
+cljs_demo.core.close_all_quotes = function close_all_quotes(state) {
+  return cljs.core.assoc.call(null, state, new cljs.core.Keyword(null, "quotes", "quotes", -844987790), cljs.core.map.call(null, cljs_demo.core.close_quote, (new cljs.core.Keyword(null, "quotes", "quotes", -844987790)).cljs$core$IFn$_invoke$arity$1(state)));
+};
 cljs_demo.core.summary = function summary(quotes) {
   var status_summary = cljs_demo.core.get_status_summary.call(null, quotes);
   return new cljs.core.PersistentVector(null, 9, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "div", "div", 1057191632), new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null, "style", "style", -496642736), new cljs.core.PersistentArrayMap(null, 7, [new cljs.core.Keyword(null, "border", "border", 1444987323), "1px solid #bbb", new cljs.core.Keyword(null, "padding-top", "padding-top", 1929675955), "20px", new cljs.core.Keyword(null, "padding-bottom", "padding-bottom", 
   -1899795591), "20px", new cljs.core.Keyword(null, "padding-left", "padding-left", -1180879053), "12px", new cljs.core.Keyword(null, "padding-right", "padding-right", -1250249681), "12px", new cljs.core.Keyword(null, "fontSize", "fontSize", 919623033), "12px", new cljs.core.Keyword(null, "backgroundColor", "backgroundColor", 1738438491), "#eee"], null)], null), (new cljs.core.Keyword(null, "newCount", "newCount", 253903917)).cljs$core$IFn$_invoke$arity$1(status_summary), " New Quotes, ", (new cljs.core.Keyword(null, 
-  "sentCount", "sentCount", 447976836)).cljs$core$IFn$_invoke$arity$1(status_summary), " Sent Quotes, and ", (new cljs.core.Keyword(null, "closedCount", "closedCount", -887787208)).cljs$core$IFn$_invoke$arity$1(status_summary), " Closed Quotes", cljs_demo.core.linkButton.call(null, "Close All")], null);
+  "sentCount", "sentCount", 447976836)).cljs$core$IFn$_invoke$arity$1(status_summary), " Sent Quotes, and ", (new cljs.core.Keyword(null, "closedCount", "closedCount", -887787208)).cljs$core$IFn$_invoke$arity$1(status_summary), " Closed Quotes", cljs_demo.core.linkButton.call(null, "Close All", function(status_summary) {
+    return function(_) {
+      return cljs_demo.core.transact_BANG_.call(null, cljs_demo.core.close_all_quotes);
+    };
+  }(status_summary))], null);
 };
 cljs_demo.core.app_view = function app_view(state) {
   return cljs_demo.lib.dom.call(null, new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "div", "div", 1057191632), cljs_demo.core.summary.call(null, (new cljs.core.Keyword(null, "quotes", "quotes", -844987790)).cljs$core$IFn$_invoke$arity$1(state)), cljs_demo.core.quote_list.call(null, (new cljs.core.Keyword(null, "quotes", "quotes", -844987790)).cljs$core$IFn$_invoke$arity$1(state))], null));
@@ -47151,7 +47204,4 @@ cljs_demo.core.app_view = function app_view(state) {
 cljs_demo.core.render = function render(state) {
   return cljs_demo.lib.replace_dom.call(null, new cljs.core.Keyword(null, "#app-root", "#app-root", 1813789094), cljs_demo.core.app_view.call(null, state));
 };
-cljs_demo.core.state = new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null, "quotes", "quotes", -844987790), new cljs.core.PersistentVector(null, 4, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.PersistentArrayMap(null, 3, [new cljs.core.Keyword(null, "id", "id", -1388402092), 1, new cljs.core.Keyword(null, "name", "name", 1843675177), "First Quote", new cljs.core.Keyword(null, "status", "status", -1997798413), "New"], null), new cljs.core.PersistentArrayMap(null, 3, 
-[new cljs.core.Keyword(null, "id", "id", -1388402092), 2, new cljs.core.Keyword(null, "name", "name", 1843675177), "Second Quote", new cljs.core.Keyword(null, "status", "status", -1997798413), "New"], null), new cljs.core.PersistentArrayMap(null, 3, [new cljs.core.Keyword(null, "id", "id", -1388402092), 3, new cljs.core.Keyword(null, "name", "name", 1843675177), "Third Quote", new cljs.core.Keyword(null, "status", "status", -1997798413), "New"], null), new cljs.core.PersistentArrayMap(null, 3, [new cljs.core.Keyword(null, 
-"id", "id", -1388402092), 4, new cljs.core.Keyword(null, "name", "name", 1843675177), "Forth Quote", new cljs.core.Keyword(null, "status", "status", -1997798413), "New"], null)], null)], null);
-cljs_demo.core.render.call(null, cljs_demo.core.state);
+cljs_demo.core.render.call(null, cljs.core.deref.call(null, cljs_demo.core.state_atom));
