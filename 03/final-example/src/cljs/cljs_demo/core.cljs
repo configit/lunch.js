@@ -127,7 +127,7 @@
         (if v
           (let [[_ names] v]
             (.log js/console "Got names" names))
-          (.log js/console "timeout"))
+          (.log js/console "timeout or no result"))
         (recur)
       ))
     [:div

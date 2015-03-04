@@ -8,7 +8,7 @@
 (defn dom-atom
   "Creates DOM element from 'atomic' input. If input is a keyword,
   creates an element according to the name of the keyword. If the
-  input is anything else, creates a text-node given xsinput"
+  input is anything else, creates a text-node given input"
   [atom]
   (if (keyword? atom)
     (.createElement js/document (name atom))
@@ -23,7 +23,7 @@
         (= "class" attr-name) (aset node "className" value)
         :else (aset node attr-name value)))
 
-(defn set-attrs [node attrMap] 
+(defn set-attrs [node attrMap]
   (doseq [[key-name value] attrMap]
     (set-attr node (name key-name) value)))
 
@@ -70,9 +70,11 @@
 (defn jsonp
   ([uri] (jsonp (chan) uri))
   ([c uri]
+    (try
      (let [gjsonp (goog.net.Jsonp. (goog.Uri. uri))]
        (.send gjsonp nil #(put! c %))
-       c)))
+       c)
+     (catch :default e e))))
 
 (defn by-id [id]
   (.getElementById js/document id))
