@@ -3,7 +3,7 @@
                    [cljs-demo.macros :refer [$]]
                    )
   (:require [clojure.string :as string]
-            [cljs.core.async :as async :refer [sliding-buffer chan <! >! put! take! timeout]])
+            [cljs.core.async :as async :refer [sliding-buffer chan <! >! put! take! timeout alts!]])
   (:use [cljs-demo.lib :only (replace-dom dom jsonp by-id)]))
 
 (def state-atom (atom {:quotes [{:id 1 :name "First Quote"  :status "New"}
@@ -104,7 +104,8 @@
 
 (defn filter-quotes [v quotes]
   (filter (fn [q] (or (string/blank? v)
-                      (re-find (re-pattern (string/upper-case v)) (-> q :name string/upper-case))))
+                      (re-find (re-pattern (string/upper-case v))
+                               (-> q :name string/upper-case))))
           quotes))
 
 (def base-url "http://en.wikipedia.org/w/api.php?action=opensearch&format=json&search=")
@@ -122,8 +123,11 @@
         (recur)))
     (go-loop []
       (let [v (<! wiki-ch)
-            [_ names] (<! (jsonp (str base-url v)))]
-        (.log js/console "Got names" names)
+            [v ch] (alts! [(jsonp (str base-url v)) (timeout 400)])]
+        (if v
+          (let [[_ names] v]
+            (.log js/console "Got names" names))
+          (.log js/console "timeout"))
         (recur)
       ))
     [:div
