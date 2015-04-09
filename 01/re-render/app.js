@@ -21,7 +21,7 @@ var QuoteList = React.createClass( {
         <td>{q.id}</td>
         <td>{q.name}</td>
         <td>{q.status}</td>
-      </tr>
+      </tr>;
     } );
   }
 } );
@@ -33,15 +33,15 @@ var App = React.createClass( {
   },
 
   componentDidMount: function() {
-    setInterval( ()=>{
-      var newQuotes = QuoteApi.get( 200 )
-        .sort( (q1,q2)=> q1.status.localeCompare( q2.status ) );
+    setInterval( () => {
+      var newQuotes = QuoteApi.get( 200 );
+        //.sort( (q1, q2) => q1.status.localeCompare( q2.status ) );
       this.setState( { quotes: newQuotes } );
     }, 1000 );
   },
 
   render: function( ) {
-    return <QuoteList quotes={this.state.quotes}/>
+    return <QuoteList quotes={this.state.quotes}/>;
   }
 } );
 

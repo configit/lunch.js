@@ -6,66 +6,73 @@ var quotes = [
   { id: 1, name: 'First Quote' },
   { id: 2, name: 'Second Quote' },
   { id: 3, name: 'Third Quote' },
-  { id: 4, name: 'Forth Quote' },
+  { id: 4, name: 'Forth Quote' }
 ];
 
 var CheckedLine = React.createClass( {
 
-  getInitialState: function() {
+  getInitialState() {
     return { checked: false };
   },
 
-  handleClick: function() {
+  handleClick() {
     var toggledCheck = !this.state.checked;
+
     this.setState( { checked: toggledCheck } );
-    this.props.onCheckChanged( this.props.id, toggledCheck );
+    this.props.onCheckChanged( toggledCheck );
   },
 
-  render: function() {
+  render() {
     var icon = this.state.checked ? 'icon-check' : 'icon-empty';
-    return <li onClick={this.handleClick}>
+    return <div onClick={this.handleClick}>
       <i className={icon}/> {this.props.children}
-    </li>;
+    </div>;
   }
 } );
 
 var Summary = React.createClass( {
-
-  render: function() {
-    return <div>{this.props.checkedCount} Selected</div>
+  render() {
+    return <div>{this.props.checkedCount} Checked</div>;
   }
 } );
 
 var QuoteList = React.createClass( {
 
-  getInitialState: function() {
-    return { checkedStatus: {} };
+  getInitialState() {
+    return {
+      checkedQuotes: {}
+    };
   },
 
-  getCheckedQuotes: function() {
-    return Object.keys( this.state.checkedStatus )
-      .filter( k => this.state.checkedStatus[k] )
+  getCheckedQuoteCount() {
+    var checkedQuotes = this.state.checkedQuotes;
+    return Object.keys( checkedQuotes )
+      .filter( k => checkedQuotes[k] )
       .length;
+  },
+
+  getCheckChangedHandler( q ) {
+    return check => {
+      var checkedQuotes = this.state.checkedQuotes;
+      checkedQuotes[q.id] = check;
+      this.setState( { checkedQuotes: checkedQuotes } );
+    };
   },
 
   render: function() {
     return <div>
       <ul>{this.renderQuotes()}</ul>
-      <Summary checkedCount={this.getCheckedQuotes()}/>
+      <Summary checkedCount={this.getCheckedQuoteCount()}/>
     </div>;
-  },
-
-  handleCheckChanged: function( id, checked ) {
-    var checkedStatus = this.state.checkedStatus;
-    checkedStatus[id] = checked;
-    this.setState( { checkedStatus: checkedStatus } );
   },
 
   renderQuotes: function() {
     return this.props.quotes.map( (q) => (
-      <CheckedLine id={q.id} onCheckChanged={this.handleCheckChanged}>
-        {q.id} {q.name}
-      </CheckedLine>
+      <li>
+        <CheckedLine onCheckChanged={this.getCheckChangedHandler(q)}>
+          {q.id} {q.name}
+        </CheckedLine>
+      </li>
     ) );
   }
 } );
