@@ -6,10 +6,10 @@ This repository is for keeping resources and discussions around the LunchJS sess
 * [React](https://github.com/configit/lunch.js/issues/2)
 * [React and Flux](https://github.com/configit/lunch.js/issues/3)
 * [ClojureScript](https://github.com/configit/lunch.js/issues/13)
-
+* [ES6 (JavaScript next is now)](https://github.com/configit/lunch.js/issues/1)
+* 
 ## Ideas for sessions
 
-* [ES6 (JavaScript next is now)](https://github.com/configit/lunch.js/issues/1)
 * [Testing javascript](https://github.com/configit/lunch.js/issues/4)
 * [Promises](https://github.com/configit/lunch.js/issues/5)
 * [Javascript modules](https://github.com/configit/lunch.js/issues/6)
