@@ -1,24 +1,32 @@
 import ReactDOM from 'react-dom';
 import React from 'react';
 
-const Key = ( { char, size, onKeyPress } ) => (
-   <button
-     style={{ fontSize: size }}
-     onClick={()=>onKeyPress(char)}>
-     {char.toUpperCase()}
-   </button>
-);
+const Key = ( { char, size, isActive, onKeyPress } ) => {
+  var style = { fontSize: size };
+  if ( isActive ) {
+    style.backgroundColor = 'gray';
+    style.border = 'none';
+  }
+  return (
+    <button
+      style={style}
+      onClick={()=>onKeyPress(char)}>
+      {char}
+    </button>
+  );
+};
 Key.propTypes = {
   char: React.PropTypes.string.isRequired,
   onKeyPress: React.PropTypes.func.isRequired,
   size: React.PropTypes.string.isRequired
 }
 
-const KeyBoardRow = ({ keys, size, onKeyPress }) => (
+const KeyBoardRow = ({ keys, activeKey, size, onKeyPress }) => (
   <div>
     {keys.split('').map( (key,i) =>
       <Key
         char={key}
+        isActive={key.toLowerCase() === activeKey.toLowerCase()}
         key={key + i}
         size={size}
         onKeyPress={onKeyPress}/>
@@ -31,17 +39,21 @@ KeyBoardRow.propTypes = {
   size: React.PropTypes.string.isRequired
 }
 
-const Terminal = ({ output, favorites, keySize, onKeyPress, onClear }) => (
+const KeyBoard = ({favorites, keySize, activeKey, onKeyPress}) => (
+  <div className="keyboard">
+    <KeyBoardRow keys="1234567890" size={keySize} activeKey={activeKey} onKeyPress={onKeyPress}/>
+    <KeyBoardRow keys="qwertyuiop" size={keySize} activeKey={activeKey} onKeyPress={onKeyPress}/>
+    <KeyBoardRow keys="asdfghjkl" size={keySize} activeKey={activeKey} onKeyPress={onKeyPress}/>
+    <KeyBoardRow keys="zxcvbnm,." size={keySize} activeKey={activeKey} onKeyPress={onKeyPress}/>
+    { favorites &&
+      <KeyBoardRow keys={favorites} size={keySize} onKeyPress={onKeyPress}/>
+    }
+  </div>
+)
+
+const Terminal = ({ output, onClear, children }) => (
   <div>
-    <div className="keyboard">
-      <KeyBoardRow keys="1234567890" size={keySize} onKeyPress={onKeyPress}/>
-      <KeyBoardRow keys="qwertyuiop" size={keySize} onKeyPress={onKeyPress}/>
-      <KeyBoardRow keys="asdfghjkl" size={keySize} onKeyPress={onKeyPress}/>
-      <KeyBoardRow keys="zxcvbnm,." size={keySize} onKeyPress={onKeyPress}/>
-      { favorites &&
-        <KeyBoardRow keys={favorites} size={keySize} onKeyPress={onKeyPress}/>
-      }
-    </div>
+    {children}
     <hr/>
     <code> > {output}</code>
     <hr/>
@@ -50,9 +62,6 @@ const Terminal = ({ output, favorites, keySize, onKeyPress, onClear }) => (
 )
 Terminal.propTypes = {
   output: React.PropTypes.string.isRequired,
-  favorites: React.PropTypes.string.isRequired,
-  keySize: React.PropTypes.string.isRequired,
-  onKeyPress: React.PropTypes.func.isRequired,
   onClear: React.PropTypes.func.isRequired
 }
 
@@ -69,50 +78,107 @@ Slider.propTypes = {
   max: React.PropTypes.number,
 }
 
+var terminalService = {
+  getInitialState( ) {
+    return {
+      output: '',
+      favorites: ''
+    }
+  },
+
+  append( state, str ){
+    return { output: state.output + str };
+  },
+  clear( state ) {
+    return { output: '' };
+  },
+  setFavories( favorites ) {
+    return { favorites: favorites };
+  }
+}
+
+var settings = {
+
+  getDefaultSettings() {
+    return { keySize: '24' };
+  },
+
+  setKeySize( keySize ) {
+    return { keySize };
+  }
+}
+
 class App extends React.Component {
 
   constructor( props ) {
     super( props );
 
-    this.state = {
-      output: '',
-      favorites: '',
-      keySize: '24',
-    }
+    this.state = Object.assign(
+      {},
+      terminalService.getInitialState(),
+      settings.getDefaultSettings(),
+      { activeKey: '' }
+    );
+  }
+
+  componentDidMount() {
+    document.addEventListener( 'keydown', this.handleKeyDown.bind(this), false );
+    document.addEventListener( 'keyup', this.handleKeyUp.bind(this), false );
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener( 'keydown', this.handleKeyDown.bind(this), false );
+    document.removeEventListener( 'keyup', this.handleKeyUp.bind(this), false );
+  }
+
+  handleKeyDown( e ) {
+    this.setState( { activeKey: String.fromCharCode( e.keyCode ) } );
+    this.handleOutputAppend( String.fromCharCode( e.keyCode ).toLowerCase() );
+  }
+
+  handleKeyUp() {
+    this.setState( { activeKey: '' } );
   }
 
   handleOutputAppend( char ) {
-    this.setState( state => ({
-      output: state.output + char
-    }));
+    this.setState( state => terminalService.append( state, char ) );
   }
 
   handleOutputClear( ) {
-    this.setState( { output: '' } );
-  }
-
-  handleSizeChanged( size ) {
-    this.setState( { keySize: size } );
+    this.setState( terminalService.clear() );
   }
 
   handleFavoritesChanged( favorites ) {
-    this.setState( { favorites } );
+    this.setState( terminalService.setFavories( favorites ) );
+  }
+
+  handleSizeChanged( size ) {
+    this.setState( settings.setKeySize( size ) );
   }
 
   render() {
+    var {keySize, favorites, output, activeKey} = this.state;
     return (
       <div>
-        <Slider value={this.state.keySize}
+        <Slider value={keySize}
           onChange={this.handleSizeChanged.bind(this)}/>
 
         <input
           type="text"
-          value={this.state.favorites}
+          value={favorites}
           onChange={(e)=>this.handleFavoritesChanged(e.target.value)}/>
 
-        <Terminal {...this.state}
-          onClear={this.handleOutputClear.bind(this)}
-          onKeyPress={this.handleOutputAppend.bind(this)} />
+        <Terminal
+          output={output}
+          onClear={this.handleOutputClear.bind(this)}>
+
+          <KeyBoard
+            activeKey={activeKey}
+            favorites={favorites}
+            keySize={keySize}
+            onKeyPress={this.handleOutputAppend.bind(this)} />
+
+        </Terminal>
       </div>
     );
   }
