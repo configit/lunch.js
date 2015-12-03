@@ -1,0 +1,25 @@
+.logo {
+  width: 150px;
+  height: 180px;
+  background-size: cover;
+}
+
+.logo-link {
+  display: inline-block;
+}
+
+.logo-A {
+  background-image: url( '../images/A.png' );
+}
+
+.logo-B {
+  background-image: url( '../images/B.png' );
+}
+
+.logo-M {
+  background-image: url( '../images/M.png' );
+}
+
+.logo-Q {
+  background-image: url( '../images/Q.png' );
+}
