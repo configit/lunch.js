@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarWars", "StarWars\StarWars.csproj", "{3ECCC924-1D38-4B40-A89A-7F60A1732616}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarWars.UnitTest", "StarWars.UnitTest\StarWars.UnitTest.csproj", "{CA6D2C0A-C9C9-42FE-AFA5-857F119648F1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3ECCC924-1D38-4B40-A89A-7F60A1732616}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3ECCC924-1D38-4B40-A89A-7F60A1732616}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3ECCC924-1D38-4B40-A89A-7F60A1732616}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3ECCC924-1D38-4B40-A89A-7F60A1732616}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CA6D2C0A-C9C9-42FE-AFA5-857F119648F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA6D2C0A-C9C9-42FE-AFA5-857F119648F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA6D2C0A-C9C9-42FE-AFA5-857F119648F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA6D2C0A-C9C9-42FE-AFA5-857F119648F1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

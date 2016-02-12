@@ -1,0 +1,11 @@
+*.DS_Store
+
+.vs/
+*.user
+*.suo
+*.nupkg
+
+[Oo]bj/
+[Bb]in/
+packages/
+nuget/lib
