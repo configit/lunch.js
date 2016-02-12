@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="JsonHelper.cs" />
+    <Compile Include="LunchJsPlayground.cs" />
     <Compile Include="StarWarsQueryTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
